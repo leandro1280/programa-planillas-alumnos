@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Planilla de Notas - Cursos</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Estilos personalizados (opcional) -->
+ 
+    
+</head>
+<header><div id="botones-exportacion">
+    <button id="exportarCompleta" class="btn btn-primary">Exportar Selección Completa</button>
+    <button id="exportarParcial" class="btn btn-secondary">Exportar Selección Parcial</button>
+    <button id="exportarExcel" class="btn btn-success">Exportar a Excel</button>
+</div></header>
+<body>
+    <div class="container mt-5">
+        <h1 class="text-center mb-4">Planilla de Notas - Cursos</h1>
+
+        <!-- Botón para importar CSV -->
+        <input type="file" id="inputCSV" accept=".csv" class="form-control mb-3">
+
+        <!-- Contenedor para la selección de curso -->
+        <div id="curso-container" class="mb-3"></div>
+
+        <!-- Contenedor para las planillas -->
+        <div id="planilla-container" class="planilla-container">
+            <!-- Las planillas se generarán dinámicamente -->
+        </div>
+
+        <!-- Botones para exportar -->
+        <div class="mt-3">
+            <button id="exportarCompleta" class="btn btn-primary me-2">Exportar Selección Completa</button>
+            <button id="exportarParcial" class="btn btn-secondary">Exportar Selección Parcial</button>
+        </div>
+    </div>
+
+    <!-- Incluir las librerías -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Librería html2canvas para capturar el contenido de la planilla -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <!-- Librería jsPDF para generar el PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <!-- Botones de exportación -->
+<!-- Librería SheetJS para exportar a Excel -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+
+    <script src="script.js"></script>
+</body>
+</html>

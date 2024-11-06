@@ -1,0 +1,25 @@
+.tabla-planilla {
+    font-size: 10px; /* Reducimos el tamaño de la fuente */
+}
+
+.tabla-planilla th,
+.tabla-planilla td {
+    padding: 4px;
+    text-align: center;
+}
+
+.tabla-planilla .celda-nombre {
+    width: 150px;
+    text-align: left;
+}
+
+.tabla-planilla input[type="number"] {
+    width: 50px;
+    font-size: 10px;
+}
+
+.planilla h3 {
+    font-size: 16px;
+    margin-bottom: 10px;
+}
+
