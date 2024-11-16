@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', () => { 
     const inputCSV = document.getElementById('inputCSV');
     const cursoContainer = document.getElementById('curso-container');
     const planillaContainer = document.getElementById('planilla-container');
@@ -14,7 +14,19 @@ document.addEventListener('DOMContentLoaded', () => {
     // Definir las materias para cada curso (asegurando que los nombres de los cursos están en minúsculas)
     materiasPorCurso = {
         '1ro 1ra': ['CNT', 'CS', 'CCD', 'ART', 'EFC', 'IGS', 'MTM', 'PLG'],
-        // ... (continúa con los demás cursos)
+        '1ro 2da': ['CNT', 'CS', 'CCD', 'ART', 'EFC', 'IGS', 'MTM', 'PLG'],
+        '1ro 3ra': ['CNT', 'CS', 'CCD', 'ART', 'EFC', 'IGS', 'MTM', 'PLG'],
+        '2do 1ra': ['BLG', 'ART', 'IGS', 'CCD', 'EFC', 'FQA', 'GGF', 'HTR', 'MTM', 'PLG'],
+        '2do 2da': ['BLG', 'ART', 'IGS', 'CCD', 'EFC', 'FQA', 'GGF', 'HTR', 'MTM', 'PLG'],
+        '2do 3ra': ['BLG', 'ART', 'IGS', 'CCD', 'EFC', 'FQA', 'GGF', 'HTR', 'MTM', 'PLG'],
+        '3ro 1ra': ['BLG', 'ART', 'IGS', 'CCD', 'EFC', 'FQA', 'GGF', 'HTR', 'MTM', 'PLG'],
+        '3ro 2da': ['BLG', 'ART', 'IGS', 'CCD', 'EFC', 'FQA', 'GGF', 'HTR', 'MTM', 'PLG'],
+        '4to 1ra': ['INT FISICA', 'BLG', 'NTICX', 'IGS', 'PSI', 'EFC', 'SYA', 'GGF', 'HTR', 'MTM', 'LIT'],
+        '4to 2da': ['INT FISICA', 'BLG', 'NTICX', 'IGS', 'PSI', 'EFC', 'SYA', 'GGF', 'HTR', 'MTM', 'LIT'],
+        '5to 1ra': ['CCS', 'ECO', 'INT QUI', 'PYC', 'IGS', 'SOC', 'EFC', 'GGF', 'HTR', 'MTM', 'LIT'],
+        '5to 2da': ['CCS', 'ECO', 'INT QUI', 'PYC', 'IGS', 'SOC', 'EFC', 'GGF', 'HTR', 'MTM', 'LIT'],
+        '6to 1ra': ['PIC', 'TYC', 'FILO', 'ARTE', 'IGS', 'EFC', 'GGF', 'HTR', 'MTM', 'LIT'],
+        '6to 2da': ['PIC', 'TYC', 'FILO', 'ARTE', 'IGS', 'EFC', 'GGF', 'HTR', 'MTM', 'LIT'],
     };
 
     inputCSV.addEventListener('change', handleFileSelect);
@@ -163,26 +175,28 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     celdaNombre.appendChild(contenedorNombre);
                     celdaNombre.classList.add('celda-nombre');
+                    celdaNombre.setAttribute('rowspan', materiasPorCurso[cursoSeleccionado].length); // Combinar celdas
                 } else {
-                    celdaNombre.textContent = '';
+                    celdaNombre.style.display = 'none'; // Ocultar celdas adicionales del nombre
                 }
 
                 // Celda para la materia
                 const celdaMateria = document.createElement('td');
                 celdaMateria.textContent = materia;
 
-                // Crear celdas para las notas y asistencias
+                // Crear celdas para TEA, TEP, TED, Nota y Asistencia
                 const celdasDatos = [];
-                for (let i = 0; i < 10; i++) {
+
+                for (let i = 2; i < columnas.length; i++) {
                     const celda = document.createElement('td');
 
-                    if (columnas[i + 2].startsWith('Nota')) {
+                    if (columnas[i].startsWith('Nota')) {
                         const inputNota = document.createElement('input');
                         inputNota.type = 'number';
                         inputNota.classList.add('form-control', 'input-nota');
                         inputNota.min = 1;
                         inputNota.max = 10;
-                        inputNota.dataset.tipo = columnas[i + 2]; // 'Nota 1' o 'Nota 2'
+                        inputNota.dataset.tipo = columnas[i]; // 'Nota 1' o 'Nota 2'
 
                         // Agregar evento para actualizar las cruces
                         inputNota.addEventListener('input', () => {
@@ -218,19 +232,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (isNaN(nota)) return;
 
-        let indiceTEA, indiceTEP, indiceTED;
+        // Obtener todas las celdas de la fila
+        const celdas = fila.querySelectorAll('td');
+
+        let indiceTEA, indiceTEP, indiceTED, indiceNota;
         if (tipoNota === 'Nota 1') {
             indiceTEA = 2; // TEA 1
             indiceTEP = 3; // TEP 1
             indiceTED = 4; // TED 1
+            indiceNota = 5; // Nota 1
         } else {
-            indiceTEA = 6; // TEA 2
-            indiceTEP = 7; // TEP 2
-            indiceTED = 8; // TED 2
+            indiceTEA = 7; // TEA 2
+            indiceTEP = 8; // TEP 2
+            indiceTED = 9; // TED 2
+            indiceNota = 10; // Nota 2
         }
 
         // Limpiar cruces anteriores
-        const celdas = fila.querySelectorAll('td');
         celdas[indiceTEA].textContent = '';
         celdas[indiceTEP].textContent = '';
         celdas[indiceTED].textContent = '';
@@ -252,93 +270,104 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        const filas = Array.from(planillaContainer.querySelectorAll('tbody tr'));
+        // Clonar el contenedor de la planilla
+        const planillaClonada = planillaContainer.cloneNode(true);
 
-        if (tipoExportacion === 'parcial') {
-            // Ocultar las filas de alumnos no seleccionados
-            filas.forEach(fila => {
-                const checkbox = fila.querySelector('.checkbox-alumno');
-                if (checkbox && !checkbox.checked) {
-                    // Ocultar todas las filas correspondientes al alumno
-                    let nextFila = fila;
-                    do {
-                        nextFila.style.display = 'none';
-                        nextFila = nextFila.nextElementSibling;
-                    } while (nextFila && !nextFila.querySelector('.checkbox-alumno'));
-                }
-            });
+        // Eliminar los botones de exportación en el clon
+        const botonesClon = planillaClonada.querySelector('#botones-exportacion');
+        if (botonesClon) {
+            botonesClon.remove();
         }
 
-        // Esperar un breve momento antes de capturar
+        const filas = Array.from(planillaClonada.querySelectorAll('tbody tr'));
+
+        if (tipoExportacion === 'parcial') {
+            // Crear una lista para almacenar las filas que se van a eliminar
+            const filasParaEliminar = [];
+
+            for (let i = 0; i < filas.length; i++) {
+                const fila = filas[i];
+                const checkbox = fila.querySelector('.checkbox-alumno');
+                if (checkbox) {
+                    if (!checkbox.checked) {
+                        // Si el alumno está deseleccionado, eliminar esta fila y todas las siguientes hasta el próximo alumno
+                        filasParaEliminar.push(fila);
+                        let j = i + 1;
+                        while (j < filas.length && !filas[j].querySelector('.checkbox-alumno')) {
+                            filasParaEliminar.push(filas[j]);
+                            j++;
+                        }
+                        i = j - 1; // Actualizar el índice i
+                    }
+                }
+            }
+
+            // Eliminar las filas marcadas
+            filasParaEliminar.forEach(fila => fila.parentNode.removeChild(fila));
+        }
+
+        // Actualizar las filas después de eliminar
+        const filasAlumnos = Array.from(planillaClonada.querySelectorAll('tbody tr'));
+
+        // Si no hay alumnos seleccionados, mostrar un mensaje
+        if (filasAlumnos.length === 0) {
+            alert('No hay alumnos seleccionados para exportar.');
+            return;
+        }
+
+        // Determinar cuántas filas caben en una página
+        const alturaPagina = 297; // Altura de una página A4 en mm
+        const alturaFila = 10; // Altura estimada de una fila en mm (puedes ajustarla)
+        const filasPorPagina = Math.floor((alturaPagina - 40) / alturaFila); // Restamos espacio para márgenes y encabezados
+
+        // Dividir las filas en grupos para cada página
+        const gruposDeFilas = [];
+        for (let i = 0; i < filasAlumnos.length; i += filasPorPagina) {
+            gruposDeFilas.push(filasAlumnos.slice(i, i + filasPorPagina));
+        }
+
         setTimeout(async () => {
             const { jsPDF } = window.jspdf;
             const pdf = new jsPDF('p', 'mm', 'a4'); // Orientación vertical
 
-            // Número de alumnos por página
-            const alumnosPorPagina = 4;
-
-            // Obtener los índices de las filas donde comienza cada alumno
-            const indicesAlumnos = [];
-            filas.forEach((fila, index) => {
-                const checkbox = fila.querySelector('.checkbox-alumno');
-                if (checkbox) {
-                    indicesAlumnos.push(index);
-                }
-            });
-
-            // Número de filas por alumno (número de materias)
-            const filasPorAlumno = materiasPorCurso[cursoSeleccionado].length;
-
-            // Procesar cada grupo de alumnos
-            for (let i = 0; i < indicesAlumnos.length; i += alumnosPorPagina) {
-                // Crear un clon de la tabla
-                const tablaClonada = planillaContainer.querySelector('table').cloneNode(true);
-
-                // Obtener las filas del grupo actual
-                const grupoIndices = indicesAlumnos.slice(i, i + alumnosPorPagina);
-                const inicio = grupoIndices[0];
-                const fin = grupoIndices[grupoIndices.length - 1] + filasPorAlumno;
-
-                // Clonar las filas del encabezado
-                const thead = tablaClonada.querySelector('thead');
+            for (let i = 0; i < gruposDeFilas.length; i++) {
+                const tablaClonada = planillaClonada.querySelector('table').cloneNode(true);
                 const tbody = tablaClonada.querySelector('tbody');
                 tbody.innerHTML = ''; // Limpiar el tbody
 
                 // Agregar las filas correspondientes al grupo actual
-                const filasGrupo = filas.slice(inicio, fin);
-                filasGrupo.forEach(fila => {
-                    const filaClonada = fila.cloneNode(true);
-                    tbody.appendChild(filaClonada);
+                gruposDeFilas[i].forEach(fila => {
+                    tbody.appendChild(fila.cloneNode(true));
                 });
 
                 // Crear un contenedor temporal para renderizar
                 const contenedorTemporal = document.createElement('div');
-                contenedorTemporal.style.visibility = 'hidden';
                 contenedorTemporal.style.position = 'absolute';
+                contenedorTemporal.style.left = '-9999px'; // Mover fuera de la pantalla
                 contenedorTemporal.style.top = '0';
-                contenedorTemporal.style.left = '0';
-                contenedorTemporal.style.width = '210mm';
                 contenedorTemporal.style.backgroundColor = 'white';
                 contenedorTemporal.appendChild(tablaClonada);
                 document.body.appendChild(contenedorTemporal);
 
                 // Esperar un momento para asegurar que el contenido se renderiza
-                await new Promise(resolve => setTimeout(resolve, 100));
+                await new Promise(resolve => setTimeout(resolve, 500));
 
                 // Renderizar el contenedor temporal
                 await html2canvas(contenedorTemporal, {
                     scale: 2,
                     useCORS: true,
-                    allowTaint: true
+                    allowTaint: true,
+                    windowWidth: tablaClonada.scrollWidth,
+                    windowHeight: tablaClonada.scrollHeight
                 }).then(canvas => {
                     const imgData = canvas.toDataURL('image/png');
                     const imgWidth = 210; // Ancho de una página A4 en mm
                     const imgHeight = (canvas.height * imgWidth) / canvas.width;
 
-                    pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
-                    if (i + alumnosPorPagina < indicesAlumnos.length) {
+                    if (i > 0) {
                         pdf.addPage();
                     }
+                    pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
                 });
 
                 // Eliminar el contenedor temporal
@@ -346,26 +375,142 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             pdf.save(`planilla_${cursoSeleccionado.replace(' ', '_')}.pdf`);
-
-            // Restaurar la visibilidad de las filas
-            filas.forEach(fila => {
-                fila.style.display = '';
-            });
         }, 500); // Esperar 500 ms
     }
 
     function exportToExcel() {
-        // Recoger datos de la tabla
-        const tabla = planillaContainer.querySelector('table');
-        if (!tabla) {
+        console.log('Exportando a Excel para el curso:', cursoSeleccionado);
+
+        if (!materiasPorCurso[cursoSeleccionado]) {
+            alert('No hay materias definidas para este curso.');
+            return;
+        }
+
+        // Clonar la tabla de la planilla
+        const tablaOriginal = planillaContainer.querySelector('table');
+        if (!tablaOriginal) {
             alert('No hay datos para exportar.');
             return;
         }
 
+        const tablaClonada = tablaOriginal.cloneNode(true);
+
+        // Eliminar las filas de alumnos deseleccionados en el clon
+        const filas = Array.from(tablaClonada.querySelectorAll('tbody tr'));
+        const filasParaEliminar = [];
+
+        for (let i = 0; i < filas.length; i++) {
+            const fila = filas[i];
+            const checkbox = fila.querySelector('.checkbox-alumno');
+            if (checkbox) {
+                if (!checkbox.checked) {
+                    // Si el alumno está deseleccionado, eliminar esta fila y todas las siguientes hasta el próximo alumno
+                    filasParaEliminar.push(fila);
+                    let j = i + 1;
+                    while (j < filas.length && !filas[j].querySelector('.checkbox-alumno')) {
+                        filasParaEliminar.push(filas[j]);
+                        j++;
+                    }
+                    i = j - 1; // Actualizar el índice i
+                }
+            }
+        }
+
+        // Eliminar las filas marcadas
+        filasParaEliminar.forEach(fila => fila.parentNode.removeChild(fila));
+
+        // Convertir la tabla clonada a una hoja de cálculo
         const wb = XLSX.utils.book_new();
-        const ws = XLSX.utils.table_to_sheet(tabla);
+        const ws = XLSX.utils.table_to_sheet(tablaClonada);
+
+        // Ajustar el ancho de las columnas
+        ws['!cols'] = [
+            { wpx: 200 }, // Columna Alumno
+            { wpx: 100 }, // Columna Materia
+            { wpx: 50 },  // TEA 1
+            { wpx: 50 },  // TEP 1
+            { wpx: 50 },  // TED 1
+            { wpx: 50 },  // Nota 1
+            { wpx: 70 },  // Asistencia 1
+            { wpx: 50 },  // TEA 2
+            { wpx: 50 },  // TEP 2
+            { wpx: 50 },  // TED 2
+            { wpx: 50 },  // Nota 2
+            { wpx: 70 },  // Asistencia 2
+        ];
+
+        // Aplicar bordes a todas las celdas
+        const rango = XLSX.utils.decode_range(ws['!ref']);
+        for (let R = rango.s.r; R <= rango.e.r; ++R) {
+            for (let C = rango.s.c; C <= rango.e.c; ++C) {
+                const celdaDireccion = XLSX.utils.encode_cell({ r: R, c: C });
+                if (!ws[celdaDireccion]) continue;
+
+                if (!ws[celdaDireccion].s) ws[celdaDireccion].s = {};
+
+                ws[celdaDireccion].s.border = {
+                    top: { style: 'thin', color: { rgb: '000000' } },
+                    bottom: { style: 'thin', color: { rgb: '000000' } },
+                    left: { style: 'thin', color: { rgb: '000000' } },
+                    right: { style: 'thin', color: { rgb: '000000' } }
+                };
+            }
+        }
+
+        // Ajustar el estilo de las celdas de la primera columna (centrado vertical)
+        for (let R = rango.s.r; R <= rango.e.r; ++R) {
+            const celdaDireccion = XLSX.utils.encode_cell({ r: R, c: 0 }); // Columna A
+            if (!ws[celdaDireccion]) continue;
+
+            if (!ws[celdaDireccion].s) ws[celdaDireccion].s = {};
+
+            ws[celdaDireccion].s.alignment = {
+                vertical: 'center',
+                wrapText: true
+            };
+        }
+
         XLSX.utils.book_append_sheet(wb, ws, 'Planilla');
 
+        // Exportar el libro a un archivo Excel
         XLSX.writeFile(wb, `planilla_${cursoSeleccionado.replace(' ', '_')}.xlsx`);
     }
 });
+function actualizarPorcentajes() {
+    const totalTEA = document.querySelectorAll('.celda-cruz:contains("X")').length;
+    const totalNotas = document.querySelectorAll('.input-nota').length;
+
+    const porcentajeTEA = (totalTEA / totalNotas) * 100;
+
+    // Puedes hacer lo mismo para TEP y TED
+    // Calcula el total de TEP y TED marcados con 'X'
+
+
+    const porcentajeTEP = (totalTEP / totalNotas) * 100;
+    const porcentajeTED = (totalTED / totalNotas) * 100;
+
+    // Mostrar los porcentajes
+    const porcentajesContainer = document.getElementById('porcentajes-container');
+    porcentajesContainer.innerHTML = `
+        <p>Porcentaje TEA: ${porcentajeTEA.toFixed(2)}%</p>
+        <p>Porcentaje TEP: ${porcentajeTEP.toFixed(2)}%</p>
+        <p>Porcentaje TED: ${porcentajeTED.toFixed(2)}%</p>
+    `;
+
+}
+
+function actualizarCruces(fila, inputNota) {
+    // ... código existente ...
+
+    // Marcar la celda correspondiente
+    if (nota >= 1 && nota <= 3) {
+        celdas[indiceTED].textContent = 'X';
+    } else if (nota >= 4 && nota <= 6) {
+        celdas[indiceTEP].textContent = 'X';
+    } else if (nota >= 7 && nota <= 10) {
+        celdas[indiceTEA].textContent = 'X';
+    }
+
+    // Actualizar los porcentajes
+    actualizarPorcentajes();
+}
